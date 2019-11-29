@@ -19,6 +19,8 @@ void main() {
     front *= 100.0;
 
     float depthdif = 1.0 / pow(4.0 * max(0.0, back - front), 0.5);
-    depthdif = tanh(depthdif);
-    out_color = vec4(vec3(0.0, 0.6, 1.0) * pow(depthdif, 2.0), 1.0);
+    depthdif = pow(tanh(depthdif), 2.0);
+
+    out_color = vec4(1.0 * vec3(1.0, 0.0, 0.0) * depthdif, depthdif);
+    // out_color = vec4(vec3(1.0, 0.6, 1.0) * depthdif, depthdif);
 }
