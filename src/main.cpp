@@ -167,8 +167,8 @@ GLuint createProgram(const char* vertsrc, const char* fragsrc) {
 }
 
 int main(int, char**) {
-    int width = 1280;
-    int height = 720;
+    int width = 1024;
+    int height = 1024;
 
 
     SDL_Init(SDL_INIT_VIDEO);
@@ -249,20 +249,12 @@ int main(int, char**) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32, width, height);
 
-    GLuint fbstenciltex;
-    glGenTextures(1, &fbstenciltex);
-    glBindTexture(GL_TEXTURE_2D, fbstenciltex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_STENCIL_INDEX8, width, height);
 
     GLuint framebuffer_front;
     glGenFramebuffers(1, &framebuffer_front);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_front);
     glBindTexture(GL_TEXTURE_2D, fbdepthtex_front);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fbdepthtex_front, 0);
-    glBindTexture(GL_TEXTURE_2D, fbstenciltex);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, fbstenciltex, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glStencilFunc(GL_EQUAL, 1, 0xff);
@@ -299,15 +291,15 @@ int main(int, char**) {
         
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
-        // glDepthFunc(GL_LEQUAL);
-        // glClearDepth(1.0f);
+        glDepthFunc(GL_LEQUAL);
+        glClearDepth(1.0f);
 
-        GLenum buffers[] = {GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT};
-        glDrawBuffers(1, buffers);
 
         glUseProgram(meshprog);
         glDrawBuffer(GL_DEPTH_ATTACHMENT);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_back);
+        GLenum buffers[] = {GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT};
+        glDrawBuffers(1, buffers);
         glClearDepth(0.0f);
         glDepthFunc(GL_GEQUAL);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -320,6 +312,7 @@ int main(int, char**) {
 
 
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_front);
+        glDrawBuffers(1, buffers);
         glClearDepth(1.0f);
         glDepthFunc(GL_LEQUAL);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
